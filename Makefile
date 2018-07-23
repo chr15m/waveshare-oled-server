@@ -1,12 +1,7 @@
-DIR_FONTS = ./fonts
-DIR_OBJ = ./obj
-DIR_BIN = ./bin
+SRC = $(wildcard fonts/*.c src/*.c)
+OBJ = $(patsubst %.c,bin/%.o,$(notdir ${SRC}))
 
-OBJ_C = $(wildcard ${DIR_FONTS}/*.c ${DIR_OBJ}/*.c)
-OBJ_O = $(patsubst %.c,${DIR_BIN}/%.o,$(notdir ${OBJ_C}))
-
-TARGET = oled_1in3
-#BIN_TARGET = ${DIR_BIN}/${TARGET}
+TARGET = waveshare-oled-server
 
 CC = gcc
 
@@ -15,17 +10,19 @@ CFLAGS += $(DEBUG)
 
 LIB = -lwiringPi
 
-${TARGET}: ${OBJ_O}
-	$(CC) $(CFLAGS) $(OBJ_O) -o $@ $(LIB)
+${TARGET}: $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o $@ $(LIB)
 
-${DIR_BIN}:
+bin:
 	mkdir -p bin
 
-${DIR_BIN}/%.o: $(DIR_OBJ)/%.c $(DIR_BIN)
+bin/%.o: src/%.c bin
 	$(CC) $(CFLAGS) -c  $< -o $@ $(LIB)
 
-${DIR_BIN}/%.o: $(DIR_FONTS)/%.c $(DIR_BIN)
+bin/%.o: fonts/%.c bin
 	$(CC) $(CFLAGS) -c  $< -o $@ 
-	
+
+.PHONY: clean
+
 clean:
-	$(RM) -rf $(DIR_BIN) $(TARGET) $(DIR_OBJ)/.*.sw?
+	rm -rf -rf bin $(TARGET)
