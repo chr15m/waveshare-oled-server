@@ -26,7 +26,7 @@ int main(void) {
 
 	// create UDP socket
 	if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)	{
-		die("socket");
+		die("Could not create UDP socket.");
 	}
 
 	// zero out the structure
@@ -38,24 +38,25 @@ int main(void) {
 
 	// bind socket to port
 	if( bind(s , (struct sockaddr*)&si_me, sizeof(si_me) ) == -1) {
-		die("bind");
+		die("Couldn't bind to UDP socket.");
 	}
 
 	// 2.show
-	printf("**********Init OLED**********\r\n");
+	printf("**********Init OLED**********\n");
 	OLED_SCAN_DIR OLED_ScanDir = SCAN_DIR_DFT;//SCAN_DIR_DFT = D2U_L2R
 	OLED_Init(OLED_ScanDir);
 
-	printf("OLED Show \r\n");
+	printf("OLED Show \n");
 	//GUI_Show();
-	GUI_DisString_EN(0, 0, "hello", &Font12, FONT_BACKGROUND, WHITE); 
+	GUI_DisString_EN(0, 0, "waveshare oled server", &Font12, FONT_BACKGROUND, WHITE);
+	OLED_Display();
 
 	while(1) {
 		OLED_Clear(0x00);
 		memset(buf, 0, BUFLEN);
 		// block on network receive
 		if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen)) == -1) {
-		    die("recvfrom()");
+		    die("UDP recvfrom failed.");
 		}
         	GUI_DisString_EN(0, 0, buf, &Font12, FONT_BACKGROUND, WHITE); 
 		OLED_Display();		
