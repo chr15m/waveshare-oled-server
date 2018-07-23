@@ -1,5 +1,6 @@
 #include <stdio.h>		//printf()
 #include <stdlib.h>		//exit()
+#include <string.h>
 
 #include "OLED_Driver.h"
 #include "OLED_GUI.h"
@@ -20,6 +21,8 @@ int main(void) {
 	struct sockaddr_in si_me, si_other;
 	int s, slen = sizeof(si_other), recv_len;
 	char buf[BUFLEN];
+	char *token;
+	int line = 0;
 
 	// 1.System Initialization
 	if (System_Init()) exit(0);
@@ -46,10 +49,12 @@ int main(void) {
 	OLED_SCAN_DIR OLED_ScanDir = SCAN_DIR_DFT;//SCAN_DIR_DFT = D2U_L2R
 	OLED_Init(OLED_ScanDir);
 
-	printf("OLED Show \n");
+	printf("OLED Show\n");
 	//GUI_Show();
 	GUI_DisString_EN(0, 0, "waveshare oled server", &Font12, FONT_BACKGROUND, WHITE);
 	OLED_Display();
+
+	printf("Main loop\n");
 
 	while(1) {
 		OLED_Clear(0x00);
@@ -58,8 +63,14 @@ int main(void) {
 		if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen)) == -1) {
 		    die("UDP recvfrom failed.");
 		}
-        	GUI_DisString_EN(0, 0, buf, &Font12, FONT_BACKGROUND, WHITE); 
-		OLED_Display();		
+		line = 0;
+		token = strtok(buf, "\n");
+		while (token) {
+			GUI_DisString_EN(0, line * 14, token, &Font12, FONT_BACKGROUND, WHITE);
+			line += 1;
+			token = strtok(NULL, "\n");
+		}
+		OLED_Display();
 	}
 
 	// 3.System Exit
