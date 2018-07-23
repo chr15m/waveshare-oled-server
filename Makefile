@@ -24,7 +24,7 @@ ${DIR_BIN}:
 ${DIR_BIN}/%.o: $(DIR_OBJ)/%.c $(DIR_BIN)
 	$(CC) $(CFLAGS) -c  $< -o $@ $(LIB)
 
-${DIR_BIN}/%.o: $(DIR_FONTS)/%.c
+${DIR_BIN}/%.o: $(DIR_FONTS)/%.c $(DIR_BIN)
 	$(CC) $(CFLAGS) -c  $< -o $@ 
 	
 clean:
