@@ -13,13 +13,14 @@ LIB = -lwiringPi
 ${TARGET}: $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ $(LIB)
 
-bin:
-	mkdir -p bin
+MKDIR=@mkdir -p $(@D)
 
-bin/%.o: src/%.c bin
+bin/%.o: src/%.c
+	$(MKDIR)
 	$(CC) $(CFLAGS) -c  $< -o $@ $(LIB)
 
-bin/%.o: fonts/%.c bin
+bin/%.o: fonts/%.c
+	$(MKDIR)
 	$(CC) $(CFLAGS) -c  $< -o $@ 
 
 .PHONY: clean
