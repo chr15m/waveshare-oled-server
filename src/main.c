@@ -51,7 +51,9 @@ int main(void) {
 
 	printf("OLED Show\n");
 	//GUI_Show();
-	GUI_DisString_EN(0, 0, "waveshare oled server", &Font12, FONT_BACKGROUND, WHITE);
+	GUI_DisString_EN(0, 0, "waveshare", &Font12, FONT_BACKGROUND, WHITE);
+	GUI_DisString_EN(0, 14, "oled", &Font12, FONT_BACKGROUND, WHITE);
+	GUI_DisString_EN(0, 28, "server", &Font12, FONT_BACKGROUND, WHITE);
 	OLED_Display();
 
 	printf("Main loop\n");
