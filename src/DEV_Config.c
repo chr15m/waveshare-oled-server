@@ -1,6 +1,7 @@
 #include "DEV_Config.h"
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
+#include <wiringPiI2C.h>
 
 #include <errno.h>
 #include <stdio.h>
