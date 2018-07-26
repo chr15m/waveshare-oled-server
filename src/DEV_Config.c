@@ -28,14 +28,14 @@ uint8_t System_Init(void)
     pinMode(OLED_RST,      OUTPUT);
     pinMode(OLED_DC,       OUTPUT);
     pinMode(OLED_CS,       OUTPUT);
-    pinMode(KEY_UP_PIN,    OUTPUT);
-    pinMode(KEY_DOWN_PIN,  OUTPUT);
-    pinMode(KEY_LEFT_PIN,  OUTPUT);
-    pinMode(KEY_RIGHT_PIN, OUTPUT);
-    pinMode(KEY_PRESS_PIN, OUTPUT);
-    pinMode(KEY1_PIN,      OUTPUT);
-    pinMode(KEY2_PIN,      OUTPUT);
-    pinMode(KEY3_PIN,      OUTPUT);
+    pinMode(KEY_UP_PIN,    INPUT);
+    pinMode(KEY_DOWN_PIN,  INPUT);
+    pinMode(KEY_LEFT_PIN,  INPUT);
+    pinMode(KEY_RIGHT_PIN, INPUT);
+    pinMode(KEY_PRESS_PIN, INPUT);
+    pinMode(KEY1_PIN,      INPUT);
+    pinMode(KEY2_PIN,      INPUT);
+    pinMode(KEY3_PIN,      INPUT);
 
 #if USE_SPI
 	//3.spi init

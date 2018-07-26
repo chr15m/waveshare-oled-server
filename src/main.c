@@ -1,13 +1,14 @@
 #include <stdio.h>		//printf()
 #include <stdlib.h>		//exit()
 #include <string.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+
+#include <wiringPi.h>
 
 #include "OLED_Driver.h"
 #include "OLED_GUI.h"
 #include "DEV_Config.h"
-
-#include <arpa/inet.h>
-#include <sys/socket.h>
 
 #define BUFLEN 4096
 #define PORT 3323
@@ -15,6 +16,10 @@
 void die(char *s) {
     perror(s);
     exit(1);
+}
+
+void isr(void) {
+  printf("Pin changed.\n");
 }
 
 int main(void) {
@@ -38,6 +43,7 @@ int main(void) {
 	si_me.sin_family = AF_INET;
 	si_me.sin_port = htons(PORT);
 	si_me.sin_addr.s_addr = htonl(INADDR_ANY);
+	// si_me.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	// bind socket to port
 	if( bind(s , (struct sockaddr*)&si_me, sizeof(si_me) ) == -1) {
@@ -56,8 +62,12 @@ int main(void) {
 	GUI_DisString_EN(0, 28, "server", &Font12, FONT_BACKGROUND, WHITE);
 	OLED_Display();
 
+	pullUpDnControl(KEY1_PIN, PUD_UP);
+	wiringPiISR(KEY1_PIN, INT_EDGE_BOTH, &isr);
+
 	printf("Main loop\n");
 
+	// sendto(s,buffer,nBytes,0,(struct sockaddr *)&serverAddr,addr_size);
 	while(1) {
 		OLED_Clear(0x00);
 		memset(buf, 0, BUFLEN);
