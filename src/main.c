@@ -19,7 +19,7 @@ void die(char *s) {
 
 int main(void) {
 	struct sockaddr_in si_me, si_other;
-	int s, slen = sizeof(si_other), recv_len;
+	unsigned int s, slen = sizeof(si_other), recv_len;
 	char buf[BUFLEN];
 	char *token;
 	int line = 0;
