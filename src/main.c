@@ -12,6 +12,12 @@
 
 #define BUFLEN 4096
 #define PORT 3323
+unsigned int s = 0;
+struct sockaddr_in si_me, si_other;
+
+#define NBTNS 8
+const int btnpins[NBTNS] = {KEY_UP_PIN,	KEY_DOWN_PIN, KEY_LEFT_PIN, KEY_RIGHT_PIN, KEY_PRESS_PIN, KEY1_PIN, KEY2_PIN, KEY3_PIN};
+int btnprev[NBTNS] = {0,0,0,0,0,0,0,0};
 
 void die(char *s) {
     perror(s);
@@ -19,12 +25,23 @@ void die(char *s) {
 }
 
 void isr(void) {
-  printf("Pin changed.\n");
+  int v = 0;
+  char buffer[12];
+
+  for (int i=0; i<NBTNS; i++) {
+    if ((v = digitalRead(btnpins[i])) != btnprev[i]) {
+      sprintf(buffer, "button %d %d\n", i, !v);
+      printf(buffer);
+      if (si_other.sin_port) {
+        sendto(s, buffer, 12, 0, (struct sockaddr*)&si_other, sizeof(si_me));
+      }
+      btnprev[i] = v;
+    }
+  }
 }
 
 int main(void) {
-	struct sockaddr_in si_me, si_other;
-	unsigned int s, slen = sizeof(si_other), recv_len;
+	unsigned int slen = sizeof(si_other), recv_len;
 	char buf[BUFLEN];
 	char *token;
 	int line = 0;
@@ -34,7 +51,7 @@ int main(void) {
 
 	// create UDP socket
 	if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)	{
-		die("Could not create UDP socket.");
+	  die("Could not create UDP socket.");
 	}
 
 	// zero out the structure
@@ -46,8 +63,8 @@ int main(void) {
 	// si_me.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	// bind socket to port
-	if( bind(s , (struct sockaddr*)&si_me, sizeof(si_me) ) == -1) {
-		die("Couldn't bind to UDP socket.");
+	if(bind(s, (struct sockaddr*)&si_me, sizeof(si_me)) == -1) {
+	  die("Couldn't bind to UDP socket.");
 	}
 
 	// 2.show
@@ -62,17 +79,18 @@ int main(void) {
 	GUI_DisString_EN(0, 28, "server", &Font12, FONT_BACKGROUND, WHITE);
 	OLED_Display();
 
-	pullUpDnControl(KEY1_PIN, PUD_UP);
-	wiringPiISR(KEY1_PIN, INT_EDGE_BOTH, &isr);
+	for (int i=0; i<NBTNS; i++) {
+	  pullUpDnControl(btnpins[i], PUD_UP);
+	  wiringPiISR(btnpins[i], INT_EDGE_BOTH, &isr);
+	}
 
 	printf("Main loop\n");
 
-	// sendto(s,buffer,nBytes,0,(struct sockaddr *)&serverAddr,addr_size);
 	while(1) {
 		OLED_Clear(0x00);
 		memset(buf, 0, BUFLEN);
 		// block on network receive
-		if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen)) == -1) {
+		if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *)&si_other, &slen)) == -1) {
 		    die("UDP recvfrom failed.");
 		}
 		line = 0;
