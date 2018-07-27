@@ -62,6 +62,12 @@ int main(void) {
 	si_me.sin_addr.s_addr = htonl(INADDR_ANY);
 	// si_me.sin_addr.s_addr = inet_addr("127.0.0.1");
 
+	// allow address & port re-use
+	int reuse = 1;
+	if (setsockopt(s, SOL_SOCKET, SO_REUSEPORT, (const char*)&reuse, sizeof(reuse)) == -1) {
+          die("Couldn't set socket re-use flag.");
+        }
+
 	// bind socket to port
 	if(bind(s, (struct sockaddr*)&si_me, sizeof(si_me)) == -1) {
 	  die("Couldn't bind to UDP socket.");
